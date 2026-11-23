@@ -2,199 +2,327 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#4f46e5">
-<title>Controle de gastos</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💸</text></svg>">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16a066">
+<title>Controle de Gastos</title>
+<link rel="icon" href="https://cdn.jsdelivr.net/npm/@lobehub/fluent-emoji-3d@1.1.0/assets/1f437.webp">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f3f2fb; --card: #ffffff; --text: #1c1b2e; --muted: #6e6d85; --line: #e7e5f3; --field: #f6f5fc;
-    --indigo: #4f46e5; --violet: #7c3aed; --pink: #db2777; --soft: #eeedfd; --danger: #e11d48; --ok: #16a34a;
-    --tip: #fff6df; --tip-line: #f6dc96; --tip-text: #7a5200;
-    --shadow: 0 1px 2px rgba(28, 27, 46, .04), 0 10px 28px rgba(28, 27, 46, .07);
-  }
-  @media (prefers-color-scheme: dark) {
-    :root { --bg: #0d0c17; --card: #17162a; --text: #ecebf7; --muted: #9b99b5; --line: #2a2843; --field: #1f1d36;
-            --soft: #262357; --tip: #2b2412; --tip-line: #5a4716; --tip-text: #f5cf6c;
-            --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.3); }
+    color-scheme: light;
+    --green: #16a066; --green-d: #0d8452; --green-s: #e4f6ec; --purple: #7c5cf5; --purple-s: #ece7ff;
+    --red: #ef4444; --red-s: #fee8e8; --ink: #17202a; --muted: #6c7682; --line: #eef0f4; --bg: #eef3f7; --card: #fff;
+    --shadow: 0 1px 2px rgba(23, 32, 42, .04), 0 8px 24px rgba(23, 32, 42, .07);
   }
   * { box-sizing: border-box; }
+  html { -webkit-tap-highlight-color: transparent; }
   body {
-    margin: 0; color: var(--text); font: 16px/1.5 "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    margin: 0; color: var(--ink); font: 15px/1.45 "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
     background:
-      radial-gradient(800px 420px at 110% -10%, #7c3aed26, transparent 60%),
-      radial-gradient(700px 380px at -20% 40%, #db27771a, transparent 60%),
+      radial-gradient(520px 520px at 6% 10%, #d8f0e3 0 45%, transparent 46%),
+      radial-gradient(600px 600px at 100% 100%, #e6e0ff 0 40%, transparent 41%),
       var(--bg);
-    min-height: 100vh;
+    background-attachment: fixed;
   }
-  main { max-width: 600px; margin: 0 auto; padding: 24px 16px 64px; }
-
-  /* Cabeçalho com saldo */
-  .hero {
-    position: relative; overflow: hidden; color: #fff; border-radius: 28px; padding: 24px;
-    background: linear-gradient(135deg, #6366f1, var(--indigo) 40%, var(--violet) 75%, var(--pink));
-    box-shadow: 0 18px 40px -16px #4f46e5aa;
+  button { font: inherit; color: inherit; }
+  .app { position: relative; max-width: 440px; min-height: 100vh; margin: 0 auto; background: #f8fafb; display: flex; flex-direction: column; }
+  @media (min-width: 520px) {
+    body { padding: 28px 16px; }
+    .app { min-height: calc(100vh - 56px); border-radius: 44px; overflow: clip;
+           box-shadow: 0 0 0 10px #fff, 0 0 0 11px #dbe3ea, 0 40px 90px -30px rgba(20, 60, 50, .45); }
   }
-  .hero::before { content: ""; position: absolute; width: 260px; height: 260px; right: -90px; top: -120px; border-radius: 50%; background: #ffffff1a; }
-  .topo { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-  h1 { margin: 0; font-size: 1.15rem; font-weight: 700; opacity: .95; }
-  .mes { margin: 0; padding: 4px 12px; white-space: nowrap; border-radius: 99px; background: #ffffff26; font-size: .85rem; font-weight: 600; }
-  .saldo { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; }
-  .rotulo { font-size: .85rem; opacity: .85; font-weight: 500; }
-  #total { display: block; font-size: 2.3rem; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; font-variant-numeric: tabular-nums; }
-  .sobra-linha { margin-top: 6px; font-weight: 600; }
-  #sobra { font-variant-numeric: tabular-nums; }
-  #sobra.negativo { padding: 2px 8px; border-radius: 8px; background: #ffffff; color: var(--danger); }
-  .anel { position: relative; flex: none; width: 112px; height: 112px; }
-  .anel svg { width: 100%; height: 100%; transform: rotate(-90deg); }
-  .anel circle { fill: none; stroke-width: 10; }
-  .anel .fundo { stroke: #ffffff33; }
-  .anel .valor { stroke: #fff; stroke-linecap: round; transition: stroke-dashoffset .6s cubic-bezier(.2, .8, .2, 1); }
-  .anel.estourou .valor { stroke: #fecdd3; }
-  .anel-texto { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; line-height: 1.1; }
-  #pct { font-size: 1.5rem; font-weight: 800; }
-  .anel-texto small { font-size: .7rem; opacity: .85; }
-  .orc { position: relative; display: flex; gap: 8px; margin-top: 20px; padding: 6px; border-radius: 16px; background: #ffffff26; }
-  .orc label { align-self: center; padding-left: 10px; font-size: .85rem; font-weight: 600; white-space: nowrap; }
-  .orc input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; color: #fff; font: inherit; font-weight: 700; padding: 8px; }
-  .orc input::placeholder { color: #ffffffaa; font-weight: 500; }
-  .orc button { border: 0; border-radius: 12px; padding: 8px 16px; background: #fff; color: var(--indigo); font: inherit; font-weight: 700; cursor: pointer; }
+  .view { flex: 1; padding-bottom: 28px; animation: aparece .25s ease; }
+  .view[hidden] { display: none; }
+  @keyframes aparece { from { opacity: 0; transform: translateY(6px); } }
+  .pad { padding: 20px 18px 0; }
+  .ic { display: inline-block; vertical-align: middle; object-fit: contain; }
+  .ic-txt { display: inline-grid; place-items: center; vertical-align: middle; line-height: 1; }
 
-  #dica { display: flex; gap: 10px; align-items: flex-start; margin: 16px 0 0; padding: 14px 16px; border-radius: 18px;
-          background: var(--tip); border: 1px solid var(--tip-line); color: var(--tip-text); font-weight: 600; }
-  #dica:empty { display: none; }
+  /* Cabeçalho verde */
+  .topo { position: relative; overflow: hidden; padding: 26px 22px 86px; color: #fff;
+          background: linear-gradient(150deg, #22b877, var(--green) 50%, #0b7a4c); }
+  .topo::before, .topo::after { content: ""; position: absolute; border-radius: 50%; background: #ffffff17; }
+  .topo::before { width: 230px; height: 230px; right: -80px; top: -110px; }
+  .topo::after { width: 140px; height: 140px; left: -50px; bottom: -70px; }
+  .topo-linha { position: relative; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+  .topo h1 { margin: 0; font-size: 1.55rem; font-weight: 800; letter-spacing: -.02em; display: flex; align-items: center; gap: 6px; }
+  .topo p { margin: 4px 0 0; opacity: .9; font-size: .92rem; }
+  .mes-pill { flex: none; padding: 6px 12px; border-radius: 99px; background: #ffffff2b; font-size: .78rem; font-weight: 600; white-space: nowrap; }
 
-  /* Cartões */
-  .card { margin-top: 16px; padding: 20px; border-radius: 24px; background: var(--card); box-shadow: var(--shadow); }
-  h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 1.05rem; font-weight: 800; letter-spacing: -.01em; }
+  .sobe { position: relative; margin-top: -66px; padding: 0 16px; }
+  .card { margin-bottom: 14px; padding: 18px; border-radius: 24px; background: var(--card); box-shadow: var(--shadow); }
+  .card h2 { margin: 0 0 12px; font-size: 1.02rem; font-weight: 700; }
 
-  .campos { display: grid; grid-template-columns: 1.6fr 1fr; gap: 8px; }
-  .campos input { width: 100%; min-width: 0; padding: 13px 14px; border: 1px solid transparent; border-radius: 14px; outline: none;
-                  background: var(--field); color: inherit; font: inherit; }
-  .campos input:focus { border-color: var(--indigo); box-shadow: 0 0 0 3px #4f46e533; }
-  .cats { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; border: 0; padding: 0; }
-  .cat input { position: absolute; opacity: 0; pointer-events: none; }
-  .cat span { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 99px; cursor: pointer;
-              border: 1.5px solid var(--line); font-weight: 600; font-size: .92rem; transition: all .15s; }
-  .cat span:hover { border-color: var(--c); }
-  .cat input:checked + span { background: var(--c); border-color: var(--c); color: #fff; box-shadow: 0 6px 14px -6px var(--c); }
-  .cat input:focus-visible + span { outline: 3px solid #4f46e555; outline-offset: 2px; }
-  .btn { width: 100%; padding: 14px; border: 0; border-radius: 16px; cursor: pointer; color: #fff; font: inherit; font-weight: 700;
-         background: linear-gradient(135deg, var(--indigo), var(--violet)); box-shadow: 0 10px 20px -10px #4f46e5; transition: transform .15s; }
-  .btn:hover { transform: translateY(-1px); }
-  .btn:active { transform: translateY(1px); }
-  #msg { margin: 10px 0 0; color: var(--danger); font-size: .9rem; font-weight: 600; }
-  #msg:empty { display: none; }
+  .saldo { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+  .saldo small { color: var(--muted); font-weight: 500; }
+  #sobra { display: block; font-size: 2.1rem; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+  #sobra.negativo { color: var(--red); }
+  .varia { display: inline-block; margin-top: 4px; font-size: .82rem; font-weight: 600; color: var(--green-d); }
+  .varia.ruim { color: var(--red); }
+  .saldo .ic { filter: drop-shadow(0 10px 10px rgba(0, 0, 0, .12)); }
 
-  /* Categorias */
-  .pilha { display: flex; height: 14px; border-radius: 99px; overflow: hidden; background: var(--line); gap: 2px; }
-  .pilha span { transition: flex-grow .5s; }
-  .legenda { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; }
-  .legenda li { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 10px; }
-  .badge { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; font-size: 18px; background: color-mix(in srgb, var(--c) 16%, transparent); }
-  .legenda .barra { height: 6px; margin-top: 4px; border-radius: 99px; background: var(--line); overflow: hidden; }
-  .legenda .barra span { display: block; height: 100%; border-radius: inherit; background: var(--c); }
-  .legenda strong { font-variant-numeric: tabular-nums; text-align: right; }
-  .legenda small { display: block; color: var(--muted); font-weight: 500; text-align: right; }
+  .mes-cab { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+  .mes-cab h2 { margin: 0; }
+  .link { border: 0; background: var(--green-s); color: var(--green-d); padding: 5px 12px; border-radius: 99px; font-size: .78rem; font-weight: 600; cursor: pointer; }
+  .orc { display: flex; gap: 8px; margin-bottom: 14px; }
+  .orc[hidden] { display: none; }
+  .orc input { flex: 1; min-width: 0; padding: 11px 14px; border: 1.5px solid var(--line); border-radius: 14px; outline: none; font: inherit; background: #f6f8fa; }
+  .orc input:focus { border-color: var(--green); background: #fff; }
+  .orc button { border: 0; border-radius: 14px; padding: 0 18px; background: var(--green); color: #fff; font-weight: 700; cursor: pointer; }
+  .duas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .duas > div { display: flex; align-items: center; gap: 10px; }
+  .seta { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border-radius: 50%; font-size: 1.2rem; font-weight: 800; }
+  .s-verde { background: var(--green-s); color: var(--green); }
+  .s-vermelha { background: var(--red-s); color: var(--red); }
+  .duas small { display: block; color: var(--muted); font-size: .76rem; }
+  .duas b { font-size: 1.05rem; font-variant-numeric: tabular-nums; }
+  .faixa { margin: 14px 0 0; padding: 10px 14px; border-radius: 14px; background: var(--green-s); color: var(--green-d); font-weight: 600; font-size: .88rem; text-align: center; }
+  .faixa.ruim { background: var(--red-s); color: var(--red); }
+  .faixa:empty { display: none; }
 
-  /* Lista */
-  #lista { list-style: none; margin: 0; padding: 0; }
-  #lista li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
-  #lista li:first-child { border-top: 0; padding-top: 0; }
-  #lista li.anima { animation: entra .4s cubic-bezier(.2, .8, .2, 1.2); }
-  @keyframes entra { from { transform: translateY(-6px); opacity: 0; } }
-  .desc { flex: 1; min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
-  .desc small { display: block; color: var(--muted); font-weight: 500; font-size: .85rem; }
+  .visao { display: flex; align-items: center; gap: 18px; }
+  .rosca { flex: none; position: relative; width: 128px; height: 128px; border-radius: 50%; background: #e9eef2; transition: background .4s; }
+  .rosca::before { content: ""; position: absolute; inset: 16px; border-radius: 50%; background: #fff; }
+  .rosca div { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; line-height: 1.1; }
+  .rosca b { font-size: 1.5rem; font-weight: 800; }
+  .rosca small { color: var(--muted); font-size: .74rem; }
+  .leg { flex: 1; list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .leg li { display: flex; align-items: center; gap: 8px; font-size: .84rem; color: var(--muted); }
+  .leg i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); }
+  .leg b { margin-left: auto; color: var(--ink); font-variant-numeric: tabular-nums; }
+
+  .aviso { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; padding: 16px; border-radius: 22px;
+           background: linear-gradient(135deg, #fff8e1, #ffeab0); }
+  .aviso.ruim { background: linear-gradient(135deg, #fff0f0, #ffd9d9); }
+  .aviso b { display: block; font-size: .98rem; }
+  .aviso span { font-size: .84rem; color: #5f5537; }
+  .aviso.ruim span { color: #7a3434; }
+
+  /* Gastos */
+  .tit { margin: 0 0 14px; font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; }
+  .tot-linha { display: flex; align-items: flex-end; justify-content: space-between; gap: 8px; }
+  #total2 { font-size: 1.9rem; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+  .comp { text-align: right; font-size: .8rem; font-weight: 700; }
+  .comp small { display: block; color: var(--muted); font-weight: 500; }
+  .comp.bom { color: var(--green); } .comp.ruim { color: var(--red); }
+  .grafico { display: flex; align-items: flex-end; gap: 10px; height: 170px; margin-top: 16px; padding-top: 30px; }
+  .col { flex: 1; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; gap: 6px; }
+  .col .bar { position: relative; width: 100%; max-width: 34px; min-height: 4px; border-radius: 10px 10px 6px 6px; background: #d9d0ff; transition: height .5s cubic-bezier(.2, .8, .2, 1); }
+  .col.atual .bar { background: linear-gradient(180deg, #9b84ff, var(--purple)); box-shadow: 0 8px 16px -8px var(--purple); }
+  .col .bolha { position: absolute; bottom: calc(100% + 6px); left: 50%; transform: translateX(-50%); padding: 3px 8px; border-radius: 8px;
+                background: var(--purple); color: #fff; font-size: .68rem; font-weight: 700; white-space: nowrap; }
+  .col small { color: var(--muted); font-size: .72rem; text-transform: capitalize; }
+  .col.atual small { color: var(--purple); font-weight: 700; }
+
+  .cats-lista, .lancamentos { list-style: none; margin: 0; padding: 0; }
+  .cats-lista li { display: grid; grid-template-columns: 44px 1fr auto; gap: 12px; align-items: center; padding: 8px 0; }
+  .ic-box { display: grid; place-items: center; width: 44px; height: 44px; border-radius: 14px; background: var(--bg-c); }
+  .cats-lista .nome { font-weight: 600; font-size: .9rem; }
+  .cats-lista .barra { height: 7px; margin-top: 6px; border-radius: 99px; background: var(--line); overflow: hidden; }
+  .cats-lista .barra span { display: block; height: 100%; border-radius: inherit; background: var(--c); }
+  .cats-lista .val { text-align: right; font-weight: 700; font-size: .9rem; font-variant-numeric: tabular-nums; }
+  .cats-lista .val small { display: block; color: var(--muted); font-weight: 500; font-size: .74rem; }
+
+  .lancamentos li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+  .lancamentos li:first-child { border-top: 0; padding-top: 0; }
+  .lancamentos li.anima { animation: entra .45s cubic-bezier(.2, .8, .2, 1.3); }
+  @keyframes entra { from { opacity: 0; transform: translateX(-12px); } }
+  .desc { flex: 1; min-width: 0; font-weight: 600; font-size: .92rem; overflow-wrap: anywhere; }
+  .desc small { display: block; color: var(--muted); font-weight: 500; font-size: .76rem; }
   .valor { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .remover { flex: none; width: 34px; height: 34px; border: 0; border-radius: 10px; background: none; color: var(--muted);
-             font-size: 1.3rem; line-height: 1; cursor: pointer; transition: background .15s, color .15s; }
-  .remover:hover, .remover:focus-visible { background: #e11d481a; color: var(--danger); }
-  .vazio { padding: 16px 0; text-align: center; color: var(--muted); }
-  .vazio .grande { display: block; font-size: 40px; }
+  .remover { flex: none; width: 32px; height: 32px; border: 0; border-radius: 10px; background: none; color: #9aa3ad; font-size: 1.3rem; line-height: 1; cursor: pointer; }
+  .remover:hover, .remover:focus-visible { background: var(--red-s); color: var(--red); }
+  .vazio { display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 18px 8px; text-align: center; color: var(--muted); font-size: .9rem; }
+  .vazio b { color: var(--ink); }
 
   /* Resumo */
-  .resumo p { margin: 0 0 10px; }
-  .resumo .destaque { font-size: 1.05rem; font-weight: 700; }
-  .economia { display: grid; gap: 10px; margin-top: 14px; }
-  .economia div { display: grid; grid-template-columns: 36px 1fr; gap: 12px; padding: 14px; border-radius: 18px; background: var(--field); }
-  .economia strong { display: block; }
-  .economia em { display: inline-block; margin-top: 6px; padding: 2px 10px; border-radius: 99px; font-style: normal; font-weight: 700;
-                 font-size: .85rem; background: #16a34a1f; color: var(--ok); }
+  .situacao p { margin: 0 0 8px; color: #3c4652; }
+  .situacao p:first-child { color: var(--ink); font-size: 1.05rem; font-weight: 700; }
+  .eco { display: grid; grid-template-columns: 48px 1fr; gap: 12px; align-items: start; }
+  .eco + .eco { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); }
+  .eco b { display: block; }
+  .eco span { font-size: .86rem; color: #4b5563; }
+  .eco em { display: inline-block; margin-top: 8px; padding: 3px 10px; border-radius: 99px; background: var(--green-s); color: var(--green-d);
+            font-style: normal; font-weight: 700; font-size: .8rem; }
+  .btn-sec { margin-top: 10px; border: 0; border-radius: 12px; padding: 8px 14px; background: #fff; font-weight: 700; cursor: pointer; box-shadow: var(--shadow); }
 
-  footer { margin-top: 40px; text-align: center; color: var(--muted); font-size: .85rem; }
-  @media (max-width: 420px) { h1 { font-size: 1rem; white-space: nowrap; } .mes { font-size: .75rem; padding: 3px 10px; } #total { font-size: 1.9rem; } .anel { width: 96px; height: 96px; } #pct { font-size: 1.25rem; } .anel-texto small { font-size: .6rem; } .longo { display: none; } .campos { grid-template-columns: 1fr; } }
+  /* Menu de baixo + botão de adicionar */
+  .tabbar { position: sticky; bottom: 0; z-index: 5; display: flex; justify-content: space-around; padding: 8px 90px calc(10px + env(safe-area-inset-bottom)) 8px;
+            background: #ffffffee; backdrop-filter: blur(10px); border-top: 1px solid var(--line); }
+  .tabbar > button[data-v] { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 0; border: 0; background: none;
+                     color: #8a939d; font-size: .72rem; font-weight: 500; cursor: pointer; }
+  .tabbar svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .tabbar > button[data-v][aria-current=page] { color: var(--green); font-weight: 700; }
+  .fab { position: absolute; right: 18px; top: -26px; width: 64px; height: 64px; border: 4px solid #f8fafb; border-radius: 22px; cursor: pointer;
+         background: linear-gradient(145deg, #2cc483, var(--green-d)); color: #fff; font-size: 2rem; line-height: 1; font-weight: 400;
+         box-shadow: 0 14px 24px -10px var(--green-d); transition: transform .15s; }
+  .fab:hover { transform: translateY(-2px) rotate(90deg); }
+
+  /* Gaveta */
+  .sheet { position: fixed; inset: 0; z-index: 20; }
+  .sheet[hidden] { display: none; }
+  .sheet-fundo { position: absolute; inset: 0; background: rgba(15, 25, 35, .4); animation: fade .2s; }
+  .sheet-painel { position: absolute; left: 50%; bottom: 0; width: min(440px, 100%); max-height: 90vh; overflow: auto; transform: translateX(-50%);
+                  padding: 10px 18px calc(18px + env(safe-area-inset-bottom)); border-radius: 28px 28px 0 0; background: #fff; animation: sobe .3s cubic-bezier(.2, .8, .2, 1); }
+  @keyframes fade { from { opacity: 0; } }
+  @keyframes sobe { from { transform: translate(-50%, 100%); } }
+  .pegador { width: 44px; height: 5px; margin: 0 auto 12px; border-radius: 3px; background: #dfe4ea; }
+  .sheet-cab { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+  .sheet-cab h2 { margin: 0; font-size: 1.2rem; }
+  .fechar { width: 36px; height: 36px; border: 0; border-radius: 12px; background: #f1f4f7; font-size: 1.3rem; cursor: pointer; }
+  .campo { display: block; margin-bottom: 12px; }
+  .campo span { display: block; margin: 0 0 6px 4px; color: var(--muted); font-size: .8rem; font-weight: 600; }
+  .campo input { width: 100%; padding: 13px 14px; border: 1.5px solid var(--line); border-radius: 16px; outline: none; font: inherit; background: #f6f8fa; }
+  .campo input:focus { border-color: var(--green); background: #fff; }
+  .valor-grande input { font-size: 1.6rem; font-weight: 800; text-align: center; letter-spacing: -.02em; }
+  .cat-opcoes { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin: 0 0 16px; padding: 0; border: 0; }
+  .cat-opcoes label { cursor: pointer; }
+  .cat-opcoes input { position: absolute; opacity: 0; pointer-events: none; }
+  .cat-opcoes .op { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 10px 2px; border: 2px solid transparent; border-radius: 16px;
+                    background: var(--bg-c); font-size: .68rem; font-weight: 600; text-align: center; transition: all .15s; }
+  .cat-opcoes input:checked + .op { border-color: var(--c); box-shadow: 0 8px 16px -10px var(--c); transform: translateY(-2px); }
+  .cat-opcoes input:focus-visible + .op { outline: 3px solid #16a06655; outline-offset: 2px; }
+  .btn { width: 100%; padding: 15px; border: 0; border-radius: 16px; cursor: pointer; color: #fff; font-weight: 700; font-size: 1rem;
+         background: linear-gradient(135deg, #22b877, var(--green-d)); box-shadow: 0 12px 22px -12px var(--green-d); }
+  #msg { margin: 10px 0 0; color: var(--red); font-size: .85rem; font-weight: 600; text-align: center; }
+  #msg:empty { display: none; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); z-index: 30; transform: translateX(-50%);
+           padding: 10px 18px; border-radius: 99px; background: #17202a; color: #fff; font-size: .88rem; font-weight: 600; box-shadow: var(--shadow); animation: fade .2s; }
+  .toast[hidden] { display: none; }
+
+  @media (max-width: 380px) { #sobra { font-size: 1.8rem; } .rosca { width: 110px; height: 110px; } }
   @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
-<main>
-  <header class="hero">
-    <div class="topo">
-      <h1>💸 Controle de gastos</h1>
-      <p class="mes" id="titulo-mes"></p>
-    </div>
-    <div class="saldo">
-      <div>
-        <span class="rotulo">Gasto no mês</span>
-        <strong id="total">R$ 0,00</strong>
-        <div class="sobra-linha"><span class="rotulo">Sobra:</span> <span id="sobra">—</span></div>
-      </div>
-      <div class="anel" id="anel" aria-hidden="true">
-        <svg viewBox="0 0 120 120"><circle class="fundo" cx="60" cy="60" r="50"/><circle class="valor" cx="60" cy="60" r="50"/></svg>
-        <div class="anel-texto"><span id="pct">—</span><small>do orçamento</small></div>
-      </div>
-    </div>
-    <form id="form-orcamento" class="orc">
-      <label for="orcamento"><span class="longo">Orçamento </span>R$</label>
-      <input id="orcamento" aria-label="Orçamento do mês em reais" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ex.: 3000">
-      <button>Salvar</button>
-    </form>
-  </header>
+<div class="app">
 
-  <p id="dica" role="status"></p>
+  <!-- INÍCIO -->
+  <section class="view" id="v-inicio">
+    <header class="topo">
+      <div class="topo-linha">
+        <div>
+          <h1>Olá! <i data-e="👋" data-s="30"></i></h1>
+          <p>Vamos cuidar do dinheiro deste mês</p>
+        </div>
+        <span class="mes-pill" id="mes"></span>
+      </div>
+    </header>
 
-  <section class="card">
-    <h2>➕ Novo gasto</h2>
+    <div class="sobe">
+      <div class="card saldo">
+        <div>
+          <small>Sobra do mês</small>
+          <strong id="sobra"></strong>
+          <span class="varia" id="sobra-info"></span>
+        </div>
+        <i data-e="🐷" data-s="96"></i>
+      </div>
+
+      <div class="card">
+        <div class="mes-cab"><h2>Este mês</h2><button class="link" id="btn-orc" type="button">Editar orçamento</button></div>
+        <form id="form-orcamento" class="orc" hidden>
+          <input id="orcamento" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Orçamento do mês, ex.: 3000" aria-label="Orçamento do mês em reais">
+          <button>Salvar</button>
+        </form>
+        <div class="duas">
+          <div><span class="seta s-verde">↓</span><div><small>Orçamento</small><b id="orc-valor"></b></div></div>
+          <div><span class="seta s-vermelha">↑</span><div><small>Gastos</small><b id="total"></b></div></div>
+        </div>
+        <p class="faixa" id="faixa"></p>
+      </div>
+
+      <div class="card">
+        <h2>Visão geral</h2>
+        <div class="visao">
+          <div class="rosca" id="rosca"><div><b id="pct"></b><small>usado</small></div></div>
+          <ul class="leg" id="leg"></ul>
+        </div>
+      </div>
+
+      <div class="aviso" id="dica" role="status"></div>
+    </div>
+  </section>
+
+  <!-- GASTOS -->
+  <section class="view pad" id="v-gastos" hidden>
+    <h1 class="tit">Gastos</h1>
+    <div class="card">
+      <small style="color:var(--muted)">Total do mês</small>
+      <div class="tot-linha"><strong id="total2"></strong><span class="comp" id="comparativo"></span></div>
+      <div class="grafico" id="grafico" aria-label="Gastos dos últimos 6 meses"></div>
+    </div>
+    <div class="card"><h2>Gastos por categoria</h2><ul class="cats-lista" id="cats-lista"></ul></div>
+    <div class="card"><h2>Lançamentos</h2><ul class="lancamentos" id="lista"></ul></div>
+  </section>
+
+  <!-- RESUMO -->
+  <section class="view pad" id="v-resumo" hidden>
+    <h1 class="tit">Resumo do mês</h1>
+    <div id="resumo"></div>
+  </section>
+
+  <nav class="tabbar" aria-label="Telas">
+    <button data-v="inicio" aria-current="page">
+      <svg viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>Início
+    </button>
+    <button data-v="gastos">
+      <svg viewBox="0 0 24 24"><path d="M5 20V12M12 20V5M19 20v-9"/></svg>Gastos
+    </button>
+    <button data-v="resumo">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r=".8"/></svg>Resumo
+    </button>
+    <button class="fab" id="fab" type="button" aria-label="Registrar gasto">+</button>
+  </nav>
+</div>
+
+<div class="sheet" id="sheet" hidden>
+  <div class="sheet-fundo" data-fechar></div>
+  <div class="sheet-painel" role="dialog" aria-modal="true" aria-labelledby="sheet-tit">
+    <div class="pegador"></div>
+    <div class="sheet-cab"><h2 id="sheet-tit">Novo gasto</h2><button class="fechar" data-fechar type="button" aria-label="Fechar">×</button></div>
     <form id="form-gasto">
-      <div class="campos">
-        <input id="descricao" type="text" placeholder="Com o quê? Ex.: mercado" maxlength="80" aria-label="Descrição" required>
-        <input id="valor" type="number" min="0.01" step="0.01" placeholder="R$ 0,00" aria-label="Valor em reais" inputmode="decimal" required>
-      </div>
-      <fieldset class="cats" id="cats"><legend hidden>Categoria</legend></fieldset>
+      <label class="campo valor-grande"><span>Valor</span>
+        <input id="valor" type="number" min="0.01" step="0.01" placeholder="R$ 0,00" inputmode="decimal" required>
+      </label>
+      <label class="campo"><span>Com o quê?</span>
+        <input id="descricao" type="text" placeholder="Ex.: mercado, uber, cinema" maxlength="80" required>
+      </label>
+      <fieldset class="cat-opcoes" id="cats"><legend hidden>Categoria</legend></fieldset>
       <button class="btn">Registrar gasto</button>
+      <p id="msg" role="status"></p>
     </form>
-    <p id="msg" role="status"></p>
-  </section>
-
-  <section class="card" id="sec-categorias">
-    <h2>📊 Para onde foi o dinheiro</h2>
-    <div class="pilha" id="pilha"></div>
-    <ul class="legenda" id="legenda"></ul>
-  </section>
-
-  <section class="card">
-    <h2>🧾 Gastos do mês</h2>
-    <ul id="lista"></ul>
-  </section>
-
-  <section class="card">
-    <h2>💡 Resumo do mês</h2>
-    <div class="resumo" id="resumo"></div>
-  </section>
-
-  <footer>Seus dados ficam só neste navegador.</footer>
-</main>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" hidden></div>
 
 <script>
+// Ícones 3D (Fluent Emoji da Microsoft, licença MIT). Sem internet, cai no emoji comum.
+const CDN = "https://cdn.jsdelivr.net/npm/@lobehub/fluent-emoji-3d@1.1.0/assets/";
+const el = (tag, props = {}, ...filhos) => { const e = Object.assign(document.createElement(tag), props); e.append(...filhos); return e; };
+function icone(emoji, tam = 32, classe = "") {
+  const cps = [...emoji].map(c => c.codePointAt(0).toString(16).padStart(4, "0"));
+  const nomes = [...new Set([cps.join("-"), cps.filter(h => h !== "fe0f").join("-")])];
+  const img = el("img", { className: ("ic " + classe).trim(), alt: "", width: tam, height: tam, decoding: "async" });
+  let i = 0;
+  img.onerror = () => {
+    if (++i < nomes.length) img.src = CDN + nomes[i] + ".webp";
+    else img.replaceWith(el("span", { className: ("ic-txt " + classe).trim(), textContent: emoji, style: `font-size:${tam * .8}px;width:${tam}px;height:${tam}px` }));
+  };
+  img.src = CDN + nomes[0] + ".webp";
+  return img;
+}
+const hidratar = (raiz = document) => raiz.querySelectorAll("i[data-e]").forEach(i => i.replaceWith(icone(i.dataset.e, +i.dataset.s || 32, i.className)));
+
 const CATS = {
-  "Alimentação": { emoji: "🍽️", cor: "#f97316", dica: "Planeje o cardápio da semana, vá ao mercado com lista e troque o delivery por marmita alguns dias." },
-  "Transporte":  { emoji: "🚗", cor: "#3b82f6", dica: "Junte trajetos no mesmo dia, compare aplicativo com transporte público e mantenha os pneus calibrados." },
-  "Lazer":       { emoji: "🎉", cor: "#ec4899", dica: "Defina um valor fixo por semana para lazer e alterne com programas gratuitos." },
-  "Contas":      { emoji: "🧾", cor: "#8b5cf6", dica: "Revise assinaturas e planos (celular, internet, streaming) e cancele o que pouco usa." },
-  "Outros":      { emoji: "📦", cor: "#64748b", dica: "Anote melhor o que cai em \"Outros\": gasto sem categoria costuma ser compra por impulso." },
+  "Alimentação": { e: "🍔", cor: "#f59e0b", bg: "#fff3da", dica: "Planeje o cardápio da semana, vá ao mercado com lista e troque o delivery por marmita alguns dias." },
+  "Transporte":  { e: "🚗", cor: "#3b82f6", bg: "#e6eeff", dica: "Junte trajetos no mesmo dia, compare aplicativo com transporte público e mantenha os pneus calibrados." },
+  "Lazer":       { e: "🎬", cor: "#ec4899", bg: "#ffe6f2", dica: "Defina um valor fixo por semana para lazer e alterne com programas gratuitos." },
+  "Contas":      { e: "⚡", cor: "#10b981", bg: "#e1f7ee", dica: "Revise assinaturas e planos (celular, internet, streaming) e cancele o que pouco usa." },
+  "Outros":      { e: "📦", cor: "#64748b", bg: "#edf1f5", dica: "Anote melhor o que cai em \"Outros\": gasto sem categoria costuma ser compra por impulso." },
 };
 const CATEGORIAS = Object.keys(CATS);
 const CHAVE_ORC = "gastos_orcamento";
@@ -203,7 +331,6 @@ const CHAVE_LISTA = "gastos_lista";
 // Valores guardados em centavos (inteiros): somar 0.1 + 0.2 em reais dá erro de arredondamento.
 const brl = c => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const chaveMes = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
-const el = (tag, props = {}, ...filhos) => { const e = Object.assign(document.createElement(tag), props); e.append(...filhos); return e; };
 
 function ler(chave, padrao) {
   try { return JSON.parse(localStorage.getItem(chave)) ?? padrao; } catch { return padrao; }
@@ -214,21 +341,30 @@ let gastos = ler(CHAVE_LISTA, []);
 if (!Array.isArray(gastos)) gastos = [];
 gastos = gastos.filter(g => g && Number.isFinite(g.valor) && g.valor > 0 && typeof g.mes === "string");
 let destaque = null; // id do gasto recém-registrado, para animar só ele
+let editandoOrc = false;
 
 const msg = document.getElementById("msg");
+
+function aviso(texto) {
+  const t = document.getElementById("toast");
+  t.textContent = texto; t.hidden = false;
+  clearTimeout(aviso.timer);
+  aviso.timer = setTimeout(() => { t.hidden = true; }, 2200);
+}
 
 function salvar() {
   try {
     localStorage.setItem(CHAVE_ORC, JSON.stringify(orcamento));
     localStorage.setItem(CHAVE_LISTA, JSON.stringify(gastos));
   } catch {
-    msg.textContent = "Não consegui salvar no navegador (armazenamento cheio ou bloqueado).";
+    aviso("Não consegui salvar no navegador (armazenamento cheio ou bloqueado).");
   }
 }
 
 // O orçamento é mensal: só os gastos do mês atual contam.
-const doMes = () => gastos.filter(g => g.mes === chaveMes(new Date()));
+const doMes = (chave = chaveMes(new Date())) => gastos.filter(g => g.mes === chave);
 const categoriaDe = g => (CATEGORIAS.includes(g.categoria) ? g.categoria : "Outros");
+const somar = lista => lista.reduce((s, g) => s + g.valor, 0);
 
 function porCategoria(lista) {
   const soma = Object.fromEntries(CATEGORIAS.map(c => [c, 0]));
@@ -237,24 +373,26 @@ function porCategoria(lista) {
 }
 
 function dica(total, cats) {
-  if (!total) return "👋 Nenhum gasto registrado neste mês ainda.";
-  if (orcamento && total > orcamento) return `🚨 Atenção: você passou ${brl(total - orcamento)} do orçamento.`;
+  if (!total) return { e: "👋", t: "Vamos começar?", s: "Nenhum gasto registrado neste mês ainda. Toque no + para adicionar." };
+  if (orcamento && total > orcamento) return { e: "🚨", t: "Atenção!", s: `Você passou ${brl(total - orcamento)} do orçamento.`, ruim: true };
   const [cat, valor] = cats[0];
-  return `${CATS[cat].emoji} ${cat} é a categoria que mais pesa: ${Math.round(valor / total * 100)}% do total.`;
+  return { e: CATS[cat].e, t: `${cat} é a categoria que mais pesa`, s: `${Math.round(valor / total * 100)}% do total do mês.` };
 }
+
+const diasRestantes = () => {
+  const hoje = new Date();
+  return new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate() - hoje.getDate() + 1;
+};
 
 // Resumo do mês gerado aqui mesmo, sem IA paga.
 function resumo(lista, total, cats) {
   if (!lista.length) return null;
-  const hoje = new Date();
-  const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
-  const diasRestantes = ultimoDia - hoje.getDate() + 1;
   const linhas = [];
   if (orcamento) {
     linhas.push(`Você gastou ${brl(total)} de ${brl(orcamento)} (${Math.round(total / orcamento * 100)}% do orçamento).`);
     const sobra = orcamento - total;
     linhas.push(sobra >= 0
-      ? `Faltam ${diasRestantes} dia(s) para o mês acabar: dá para gastar até ${brl(Math.floor(sobra / diasRestantes))} por dia.`
+      ? `Faltam ${diasRestantes()} dia(s) para o mês acabar: dá para gastar até ${brl(Math.floor(sobra / diasRestantes()))} por dia.`
       : `Você já passou ${brl(-sobra)} do orçamento. Segure o que não for essencial até o fim do mês.`);
   } else {
     linhas.push(`Você gastou ${brl(total)} neste mês. Defina um orçamento para acompanhar quanto sobra.`);
@@ -265,112 +403,203 @@ function resumo(lista, total, cats) {
   return { linhas, economia };
 }
 
+function ultimosMeses(n = 6) {
+  const hoje = new Date();
+  return Array.from({ length: n }, (_, i) => {
+    const d = new Date(hoje.getFullYear(), hoje.getMonth() - (n - 1 - i), 1);
+    return { chave: chaveMes(d), rotulo: d.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "") };
+  });
+}
+
+const caixaIcone = (cat, tam = 28) => { const b = el("span", { className: "ic-box" }, icone(CATS[cat].e, tam)); b.style.setProperty("--bg-c", CATS[cat].bg); return b; };
+
+/* ---------- Telas ---------- */
 function render() {
   const lista = doMes();
-  const total = lista.reduce((s, g) => s + g.valor, 0);
+  const total = somar(lista);
   const cats = porCategoria(lista);
+  const sobra = orcamento - total;
 
-  // Cabeçalho
   const mes = new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
-  document.getElementById("titulo-mes").textContent = mes.charAt(0).toUpperCase() + mes.slice(1);
-  document.getElementById("orcamento").value = orcamento ? (orcamento / 100).toFixed(2) : "";
-  document.getElementById("total").textContent = brl(total);
+  document.getElementById("mes").textContent = mes.charAt(0).toUpperCase() + mes.slice(1);
+
+  // Sobra
   const sobraEl = document.getElementById("sobra");
+  const info = document.getElementById("sobra-info");
   if (orcamento) {
-    const sobra = orcamento - total;
     sobraEl.textContent = brl(sobra);
     sobraEl.classList.toggle("negativo", sobra < 0);
+    info.textContent = sobra >= 0 ? `▲ ${Math.round(sobra / orcamento * 100)}% do orçamento livre` : `▼ passou ${brl(-sobra)} do orçamento`;
+    info.classList.toggle("ruim", sobra < 0);
   } else {
     sobraEl.textContent = "—";
     sobraEl.classList.remove("negativo");
+    info.textContent = "Defina o orçamento abaixo";
+    info.classList.remove("ruim");
   }
-  const anel = document.getElementById("anel");
-  const circ = 2 * Math.PI * 50;
-  const fracao = orcamento ? total / orcamento : 0;
-  const arco = anel.querySelector(".valor");
-  arco.style.strokeDasharray = circ;
-  arco.style.strokeDashoffset = circ * (1 - Math.min(1, fracao));
-  anel.classList.toggle("estourou", fracao > 1);
-  document.getElementById("pct").textContent = orcamento ? Math.round(fracao * 100) + "%" : "—";
 
-  document.getElementById("dica").textContent = dica(total, cats);
+  // Este mês
+  document.getElementById("orc-valor").textContent = orcamento ? brl(orcamento) : "—";
+  document.getElementById("total").textContent = brl(total);
+  document.getElementById("total2").textContent = brl(total);
+  const form = document.getElementById("form-orcamento");
+  form.hidden = !(editandoOrc || !orcamento);
+  document.getElementById("btn-orc").textContent = form.hidden ? "Editar orçamento" : "Cancelar";
+  document.getElementById("btn-orc").hidden = !orcamento;
+  if (!form.hidden && document.activeElement !== document.getElementById("orcamento")) {
+    document.getElementById("orcamento").value = orcamento ? (orcamento / 100).toFixed(2) : "";
+  }
+  const faixa = document.getElementById("faixa");
+  faixa.textContent = !orcamento ? "" : sobra >= 0
+    ? `Dá para gastar ${brl(Math.floor(sobra / diasRestantes()))} por dia até o fim do mês 🎉`
+    : `Passou ${brl(-sobra)} do orçamento. Hora de segurar!`;
+  faixa.classList.toggle("ruim", sobra < 0);
+
+  // Rosca
+  const rosca = document.getElementById("rosca");
+  const fracao = orcamento ? total / orcamento : 0;
+  rosca.classList.toggle("estourou", fracao > 1);
+  rosca.style.background = !orcamento ? "#e9eef2"
+    : fracao > 1 ? "var(--red)"
+    : `conic-gradient(var(--purple) 0 ${fracao * 360}deg, var(--green) 0)`;
+  document.getElementById("pct").textContent = orcamento ? Math.round(fracao * 100) + "%" : "—";
+  document.getElementById("leg").replaceChildren(...[
+    ["var(--purple)", "Gastos", brl(total)],
+    ["var(--green)", "Sobra", orcamento ? brl(Math.max(0, sobra)) : "—"],
+    ["#c5ced6", "Orçamento", orcamento ? brl(orcamento) : "—"],
+  ].map(([c, n, v]) => { const li = el("li", {}, el("i"), n, el("b", { textContent: v })); li.style.setProperty("--c", c); return li; }));
+
+  // Aviso automático
+  const d = dica(total, cats);
+  const box = document.getElementById("dica");
+  box.className = "aviso" + (d.ruim ? " ruim" : "");
+  box.replaceChildren(icone(d.e, 52), el("div", {}, el("b", { textContent: d.t }), el("span", { textContent: d.s })));
+
+  renderGastos(lista, total, cats);
+  renderResumo(lista, total, cats, sobra);
+  destaque = null;
+}
+
+function renderGastos(lista, total, cats) {
+  // Comparação com o mês anterior
+  const meses = ultimosMeses();
+  const totais = meses.map(m => somar(doMes(m.chave)));
+  const anterior = totais.at(-2);
+  const comp = document.getElementById("comparativo");
+  comp.className = "comp";
+  comp.replaceChildren();
+  if (anterior) {
+    const pct = Math.round((total - anterior) / anterior * 100);
+    comp.classList.add(pct <= 0 ? "bom" : "ruim");
+    comp.append(`${pct <= 0 ? "▼" : "▲"} ${Math.abs(pct)}%`, el("small", { textContent: `vs. ${meses.at(-2).rotulo}` }));
+  }
+
+  // Barras dos últimos 6 meses
+  const max = Math.max(...totais, 1);
+  document.getElementById("grafico").replaceChildren(...meses.map((m, i) => {
+    const bar = el("div", { className: "bar" });
+    bar.style.height = Math.max(3, totais[i] / max * 100) + "%";
+    bar.title = `${m.rotulo}: ${brl(totais[i])}`;
+    const atual = i === meses.length - 1;
+    if (atual && totais[i]) bar.append(el("span", { className: "bolha", textContent: brl(totais[i]).replace(",00", "") }));
+    return el("div", { className: "col" + (atual ? " atual" : "") }, bar, el("small", { textContent: m.rotulo }));
+  }));
 
   // Categorias
-  const pilha = document.getElementById("pilha");
-  const legenda = document.getElementById("legenda");
-  pilha.replaceChildren(); legenda.replaceChildren();
-  document.getElementById("sec-categorias").hidden = !cats.length;
+  const ul = document.getElementById("cats-lista");
+  ul.replaceChildren();
+  if (!cats.length) ul.append(el("li", { className: "vazio" }, "Sem gastos neste mês."));
   for (const [cat, v] of cats) {
-    const { emoji, cor } = CATS[cat];
-    const pedaco = el("span");
-    pedaco.style.cssText = `flex-grow:${v};background:${cor}`;
-    pilha.append(pedaco);
     const barra = el("div", { className: "barra" }, el("span"));
     barra.firstChild.style.width = (v / cats[0][1] * 100) + "%";
-    const li = el("li", {},
-      el("span", { className: "badge", textContent: emoji }),
-      el("div", {}, el("span", { textContent: cat }), barra),
-      el("div", {}, el("strong", { textContent: brl(v) }), el("small", { textContent: Math.round(v / total * 100) + "%" })));
-    li.style.setProperty("--c", cor);
-    legenda.append(li);
+    const li = el("li", {}, caixaIcone(cat), el("div", {}, el("span", { className: "nome", textContent: cat }), barra),
+      el("div", { className: "val" }, brl(v), el("small", { textContent: Math.round(v / total * 100) + "%" })));
+    li.style.setProperty("--c", CATS[cat].cor);
+    ul.append(li);
   }
 
-  // Lista
-  const ul = document.getElementById("lista");
-  ul.replaceChildren();
+  // Lançamentos
+  const lanc = document.getElementById("lista");
+  lanc.replaceChildren();
   if (!lista.length) {
-    ul.append(el("li", { className: "vazio" }, el("span", { className: "grande", textContent: "🪙" }), "Nenhum gasto ainda. Registre o primeiro acima."));
+    lanc.append(el("li", { className: "vazio" }, icone("🪙", 56), el("b", { textContent: "Nenhum gasto ainda" }), "Toque no + para registrar o primeiro."));
   }
   for (const g of [...lista].reverse()) {
     const cat = categoriaDe(g);
-    const badge = el("span", { className: "badge", textContent: CATS[cat].emoji });
-    badge.style.setProperty("--c", CATS[cat].cor);
-    const x = el("button", { className: "remover", textContent: "×" });
+    const x = el("button", { className: "remover", textContent: "×", type: "button" });
     x.setAttribute("aria-label", `Remover ${g.descricao}`);
     // Remove pelo id, não pela posição: a lista aparece invertida e filtrada pelo mês.
-    x.addEventListener("click", () => { gastos = gastos.filter(o => o.id !== g.id); salvar(); render(); });
-    ul.append(el("li", { className: g.id === destaque ? "anima" : "" },
-      badge,
+    x.addEventListener("click", () => { gastos = gastos.filter(o => o.id !== g.id); salvar(); render(); aviso("Gasto removido"); });
+    lanc.append(el("li", { className: g.id === destaque ? "anima" : "" },
+      caixaIcone(cat),
       el("span", { className: "desc", textContent: g.descricao }, el("small", { textContent: `${cat} · ${g.data}` })),
       el("span", { className: "valor", textContent: brl(g.valor) }),
       x));
   }
-  destaque = null;
+}
 
-  // Resumo
+function renderResumo(lista, total, cats, sobra) {
   const box = document.getElementById("resumo");
   box.replaceChildren();
   const r = resumo(lista, total, cats);
   if (!r) {
-    box.append(el("p", { textContent: "Registre gastos para ver o resumo do mês." }));
+    box.append(el("div", { className: "card vazio" }, icone("📊", 64), el("b", { textContent: "Sem dados ainda" }), "Registre gastos para ver o resumo do mês."));
     return;
   }
-  r.linhas.forEach((t, i) => box.append(el("p", { className: i === 0 ? "destaque" : "", textContent: t })));
-  const eco = el("div", { className: "economia" });
+  box.append(el("div", { className: "card situacao" }, ...r.linhas.map(t => el("p", { textContent: t }))));
+  const eco = el("div", { className: "card" }, el("h2", { textContent: "Como economizar" }));
   for (const e of r.economia) {
-    const badge = el("span", { className: "badge", textContent: CATS[e.cat].emoji });
-    badge.style.setProperty("--c", CATS[e.cat].cor);
-    eco.append(el("div", {}, badge, el("span", {},
-      el("strong", { textContent: e.cat }), e.texto, el("br"),
-      el("em", { textContent: `Cortando 15%: economia de ~${brl(e.valor)}/mês` }))));
+    eco.append(el("div", { className: "eco" }, caixaIcone(e.cat, 30),
+      el("div", {}, el("b", { textContent: e.cat }), el("span", { textContent: e.texto }), el("br"),
+        el("em", { textContent: `Cortando 15%: economia de ~${brl(e.valor)}/mês` }))));
   }
-  box.append(el("p", { className: "destaque", textContent: "Como economizar" }), eco);
+  box.append(eco);
+
+  const [e, t, s, ruim] = !orcamento ? ["🎯", "Defina um orçamento", "Com uma meta para o mês fica mais fácil saber quanto ainda pode gastar."]
+    : sobra < 0 ? ["🚨", "Hora de segurar", `O orçamento estourou em ${brl(-sobra)}. Corte o que não for essencial até o mês virar.`, true]
+    : ["🏆", "Continue assim!", `Você está dentro do orçamento e ainda tem ${brl(sobra)} para o resto do mês.`];
+  const final = el("div", { className: "aviso" + (ruim ? " ruim" : "") }, icone(e, 52), el("div", {}, el("b", { textContent: t }), el("span", { textContent: s })));
+  if (!orcamento) {
+    const b = el("button", { className: "btn-sec", type: "button", textContent: "Definir agora" });
+    b.addEventListener("click", () => { ir("inicio"); editandoOrc = true; render(); document.getElementById("orcamento").focus(); });
+    final.lastChild.append(el("br"), b);
+  }
+  box.append(final);
 }
 
-// Botões de categoria
+/* ---------- Navegação, gaveta e formulários ---------- */
+function ir(v) {
+  for (const s of document.querySelectorAll(".view")) s.hidden = s.id !== "v-" + v;
+  for (const b of document.querySelectorAll(".tabbar [data-v]")) b.setAttribute("aria-current", b.dataset.v === v ? "page" : "false");
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll(".tabbar [data-v]").forEach(b => b.addEventListener("click", () => ir(b.dataset.v)));
+
+const sheet = document.getElementById("sheet");
+function abrirGaveta() { msg.textContent = ""; sheet.hidden = false; document.getElementById("valor").focus(); }
+function fecharGaveta() { sheet.hidden = true; }
+document.getElementById("fab").addEventListener("click", abrirGaveta);
+document.querySelectorAll("[data-fechar]").forEach(b => b.addEventListener("click", fecharGaveta));
+document.addEventListener("keydown", e => { if (e.key === "Escape" && !sheet.hidden) fecharGaveta(); });
+
 const fieldset = document.getElementById("cats");
 CATEGORIAS.forEach((c, i) => {
   const input = el("input", { type: "radio", name: "categoria", value: c, defaultChecked: i === 0 });
-  const label = el("label", { className: "cat" }, input, el("span", { textContent: `${CATS[c].emoji} ${c}` }));
-  label.style.setProperty("--c", CATS[c].cor);
-  fieldset.append(label);
+  const op = el("span", { className: "op" }, icone(CATS[c].e, 30), c);
+  op.style.setProperty("--bg-c", CATS[c].bg);
+  op.style.setProperty("--c", CATS[c].cor);
+  fieldset.append(el("label", {}, input, op));
 });
 
+document.getElementById("btn-orc").addEventListener("click", () => { editandoOrc = !editandoOrc; render(); if (editandoOrc) document.getElementById("orcamento").focus(); });
 document.getElementById("form-orcamento").addEventListener("submit", e => {
   e.preventDefault();
   const v = document.getElementById("orcamento").valueAsNumber;
   orcamento = Number.isFinite(v) && v > 0 ? Math.round(v * 100) : 0;
+  editandoOrc = false;
+  document.getElementById("orcamento").blur();
   salvar(); render();
+  if (orcamento) aviso("Orçamento salvo");
 });
 
 document.getElementById("form-gasto").addEventListener("submit", e => {
@@ -389,9 +618,11 @@ document.getElementById("form-gasto").addEventListener("submit", e => {
   msg.textContent = "";
   salvar(); render();
   e.target.reset();
-  document.getElementById("descricao").focus();
+  fecharGaveta();
+  aviso(`${brl(valor)} registrado`);
 });
 
+hidratar();
 render();
 </script>
 </body>
