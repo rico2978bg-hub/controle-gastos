@@ -1,23 +1,43 @@
-# Controle de gastos
+<div align="center">
 
-Controle de gastos do mês, feito em um único arquivo HTML: HTML, CSS e JavaScript puros, sem servidor e sem nenhuma API paga.
+# 🐷 Controle de Gastos
 
-- Orçamento mensal salvo no navegador.
-- Registro de gastos com descrição, valor e categoria (Alimentação, Transporte, Lazer, Contas, Outros).
-- Cards com o total gasto e quanto sobra. O valor da sobra fica vermelho quando passa do orçamento.
-- Lista dos gastos do mês, com × para remover.
-- Dica automática: mostra a categoria que mais pesa, com a porcentagem, ou avisa quando o orçamento estoura.
-- Resumo do mês em português: quanto ainda dá para gastar por dia, para onde foi o dinheiro e sugestões concretas de economia, com o valor estimado.
+**Orçamento do mês, gráficos e um medidor de quanto vai embora em besteira.**
 
-- Gastos com besteira: cada gasto pode ser marcado como besteira (o app sugere sozinho para iFood, lanche, cerveja etc.). Um cartão mostra quanto foi no mês, a porcentagem do total, quanto isso vira em 1 ano e as besteiras que mais se repetem.
-- Visual de aplicativo de celular: rosca do orçamento, gráfico dos últimos 6 meses com comparação com o mês anterior, botão + que abre uma gaveta para registrar o gasto, e menu embaixo (Início, Gastos e Resumo).
+[![Abrir o app](https://img.shields.io/badge/Abrir_o_app-16a066?style=for-the-badge&logo=googlechrome&logoColor=white)](https://rico2978bg-hub.github.io/controle-gastos/)
 
-Ícones: [Fluent Emoji 3D](https://github.com/microsoft/fluentui-emoji), da Microsoft (licença MIT). Sem internet, o app usa os emojis comuns do sistema.
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?logo=javascript&logoColor=black)
+![Sem servidor](https://img.shields.io/badge/sem_servidor-100%25_no_navegador-16a066)
 
-Só os gastos do mês atual entram no total. Os valores são guardados em centavos, para a soma não ter erro de arredondamento.
+<img src="imagens/inicio.jpg" width="240" alt="Tela inicial com a sobra do mês">&nbsp;&nbsp;
+<img src="imagens/besteira.jpg" width="240" alt="Cartão de gastos com besteira">&nbsp;&nbsp;
+<img src="imagens/gastos.jpg" width="240" alt="Gráfico dos últimos 6 meses e gastos por categoria">
+
+</div>
+
+## O que ele faz
+
+- **Sobra do mês.** Você define o orçamento e vê quanto ainda pode gastar, inclusive por dia, até o mês acabar.
+- **Gastos com besteira 🍟.** Marque os gastos que dava para evitar. O app sugere sozinho para iFood, lanche, cerveja, açaí… e mostra:
+  - quanto foi no mês e quanto isso vira em **1 ano**;
+  - as besteiras que mais se repetem;
+  - quanto sobraria cortando metade.
+- **Gráficos.** Rosca do orçamento, barras dos últimos 6 meses e comparação com o mês anterior.
+- **Categorias.** Alimentação, Transporte, Lazer, Contas e Outros, cada uma com cor, ícone e porcentagem.
+- **Resumo do mês.** Situação do orçamento e dicas concretas de economia, com o valor que dá para poupar.
+- **Registro rápido.** O botão **+** abre uma gaveta com valor, descrição e categoria.
 
 ## Como usar
 
-Abra o `index.html` no navegador, ou use o link do GitHub Pages do repositório.
+Abra **https://rico2978bg-hub.github.io/controle-gastos/** no celular ou no computador. No celular, dá para usar "Adicionar à tela inicial" e abrir como um app.
 
-Os dados ficam no `localStorage` do navegador, nas chaves `gastos_orcamento` e `gastos_lista`.
+Para rodar localmente, basta abrir o `index.html` no navegador. Não precisa instalar nada.
+
+## Detalhes
+
+- Tudo fica em um único arquivo (`index.html`), com HTML, CSS e JavaScript puros.
+- Os valores são guardados em centavos, para a soma não ter erro de arredondamento. Só os gastos do mês atual entram no total do mês.
+- Os dados ficam salvos só no seu navegador (`localStorage`). Nada é enviado para servidor nenhum.
+- Ícones: [Fluent Emoji 3D](https://github.com/microsoft/fluentui-emoji), da Microsoft (licença MIT). Sem internet, o app usa os emojis comuns do sistema.
