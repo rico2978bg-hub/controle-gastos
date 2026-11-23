@@ -3,120 +3,207 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#4f46e5">
 <title>Controle de gastos</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💸</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #f4f5f9; --card: #fff; --text: #1d2130; --muted: #6b7080; --line: #e4e6ee;
-    --accent: #4458d8; --accent-soft: #e9ecfc; --danger: #d24b4b; --ok: #2f8a5e;
-    --tip-bg: #fff7e3; --tip-line: #f2dc9e;
-    --radius: 16px; --shadow: 0 1px 2px rgba(20, 25, 45, .05), 0 6px 20px rgba(20, 25, 45, .06);
+    --bg: #f3f2fb; --card: #ffffff; --text: #1c1b2e; --muted: #6e6d85; --line: #e7e5f3; --field: #f6f5fc;
+    --indigo: #4f46e5; --violet: #7c3aed; --pink: #db2777; --soft: #eeedfd; --danger: #e11d48; --ok: #16a34a;
+    --tip: #fff6df; --tip-line: #f6dc96; --tip-text: #7a5200;
+    --shadow: 0 1px 2px rgba(28, 27, 46, .04), 0 10px 28px rgba(28, 27, 46, .07);
   }
   @media (prefers-color-scheme: dark) {
-    :root { --bg: #0f1117; --card: #181b24; --text: #e6e8ef; --muted: #979db0; --line: #2a2e3b;
-            --accent: #8193ff; --accent-soft: #232a4d; --ok: #4cc38a; --tip-bg: #2a2414; --tip-line: #5c4a1c; }
+    :root { --bg: #0d0c17; --card: #17162a; --text: #ecebf7; --muted: #9b99b5; --line: #2a2843; --field: #1f1d36;
+            --soft: #262357; --tip: #2b2412; --tip-line: #5a4716; --tip-text: #f5cf6c;
+            --shadow: 0 1px 2px rgba(0,0,0,.3), 0 10px 28px rgba(0,0,0,.3); }
   }
   * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-  main { max-width: 600px; margin: 0 auto; padding: 32px 16px 48px; }
-  header { margin-bottom: 20px; }
-  h1 { font-size: 1.75rem; margin: 0; letter-spacing: -.02em; }
-  .sub { color: var(--muted); margin: 4px 0 0; }
-  h2 { font-size: .8rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin: 0 0 12px; }
-  .card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); padding: 20px; margin-bottom: 16px; }
-  .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .stat small { color: var(--muted); }
-  .stat strong { display: block; font-size: 1.6rem; letter-spacing: -.02em; margin-top: 2px; font-variant-numeric: tabular-nums; }
-  .negativo { color: var(--danger); }
-  .barra { height: 8px; background: var(--line); border-radius: 999px; overflow: hidden; margin-top: 16px; }
-  .barra span { display: block; height: 100%; width: 0; background: var(--ok); border-radius: inherit; transition: width .3s; }
-  .barra.estourou span { background: var(--danger); }
-  input, select { width: 100%; min-width: 0; padding: 12px 14px; font: inherit; color: inherit; background: var(--bg);
-                  border: 1px solid var(--line); border-radius: 12px; outline: none; }
-  input:focus, select:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
-  .btn { padding: 12px 18px; font: inherit; font-weight: 600; color: #fff; background: var(--accent); border: 0; border-radius: 12px; cursor: pointer; }
-  .btn:hover { filter: brightness(1.08); }
-  .btn.sec { color: var(--accent); background: var(--accent-soft); }
-  .orc { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-  .orc label { flex: 1 0 100%; color: var(--muted); font-size: .9rem; }
-  .orc input { flex: 1; width: auto; }
-  .grade { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .grade #descricao, .grade .btn { grid-column: 1 / -1; }
-  #msg { color: var(--danger); font-size: .9rem; margin: 8px 0 0; }
-  #msg:empty, #dica:empty { display: none; }
-  #dica { background: var(--tip-bg); border: 1px solid var(--tip-line); border-radius: 12px; padding: 12px 16px; margin: 0 0 16px; }
-  ul { list-style: none; padding: 0; margin: 0; }
-  li { display: flex; gap: 8px; align-items: center; padding: 10px 0; border-top: 1px solid var(--line); }
-  li:first-child { border-top: 0; padding-top: 0; }
-  li .desc { flex: 1; min-width: 0; }
-  li .desc small { display: block; color: var(--muted); font-size: .85rem; }
-  li .valor { font-weight: 600; font-variant-numeric: tabular-nums; }
-  .remover { width: 32px; height: 32px; border: 0; border-radius: 8px; background: none; color: var(--muted); font-size: 1.3rem; line-height: 1; cursor: pointer; }
-  .remover:hover, .remover:focus-visible { background: #d24b4b1a; color: var(--danger); }
-  .vazio { color: var(--muted); justify-content: center; }
-  #resumo { white-space: pre-wrap; margin: 0; }
-  @media (max-width: 420px) { .stats { gap: 12px; } .stat strong { font-size: 1.3rem; } }
+  body {
+    margin: 0; color: var(--text); font: 16px/1.5 "Plus Jakarta Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+    background:
+      radial-gradient(800px 420px at 110% -10%, #7c3aed26, transparent 60%),
+      radial-gradient(700px 380px at -20% 40%, #db27771a, transparent 60%),
+      var(--bg);
+    min-height: 100vh;
+  }
+  main { max-width: 600px; margin: 0 auto; padding: 24px 16px 64px; }
+
+  /* Cabeçalho com saldo */
+  .hero {
+    position: relative; overflow: hidden; color: #fff; border-radius: 28px; padding: 24px;
+    background: linear-gradient(135deg, #6366f1, var(--indigo) 40%, var(--violet) 75%, var(--pink));
+    box-shadow: 0 18px 40px -16px #4f46e5aa;
+  }
+  .hero::before { content: ""; position: absolute; width: 260px; height: 260px; right: -90px; top: -120px; border-radius: 50%; background: #ffffff1a; }
+  .topo { position: relative; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  h1 { margin: 0; font-size: 1.15rem; font-weight: 700; opacity: .95; }
+  .mes { margin: 0; padding: 4px 12px; white-space: nowrap; border-radius: 99px; background: #ffffff26; font-size: .85rem; font-weight: 600; }
+  .saldo { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 18px; }
+  .rotulo { font-size: .85rem; opacity: .85; font-weight: 500; }
+  #total { display: block; font-size: 2.3rem; font-weight: 800; letter-spacing: -.03em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+  .sobra-linha { margin-top: 6px; font-weight: 600; }
+  #sobra { font-variant-numeric: tabular-nums; }
+  #sobra.negativo { padding: 2px 8px; border-radius: 8px; background: #ffffff; color: var(--danger); }
+  .anel { position: relative; flex: none; width: 112px; height: 112px; }
+  .anel svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .anel circle { fill: none; stroke-width: 10; }
+  .anel .fundo { stroke: #ffffff33; }
+  .anel .valor { stroke: #fff; stroke-linecap: round; transition: stroke-dashoffset .6s cubic-bezier(.2, .8, .2, 1); }
+  .anel.estourou .valor { stroke: #fecdd3; }
+  .anel-texto { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; line-height: 1.1; }
+  #pct { font-size: 1.5rem; font-weight: 800; }
+  .anel-texto small { font-size: .7rem; opacity: .85; }
+  .orc { position: relative; display: flex; gap: 8px; margin-top: 20px; padding: 6px; border-radius: 16px; background: #ffffff26; }
+  .orc label { align-self: center; padding-left: 10px; font-size: .85rem; font-weight: 600; white-space: nowrap; }
+  .orc input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; color: #fff; font: inherit; font-weight: 700; padding: 8px; }
+  .orc input::placeholder { color: #ffffffaa; font-weight: 500; }
+  .orc button { border: 0; border-radius: 12px; padding: 8px 16px; background: #fff; color: var(--indigo); font: inherit; font-weight: 700; cursor: pointer; }
+
+  #dica { display: flex; gap: 10px; align-items: flex-start; margin: 16px 0 0; padding: 14px 16px; border-radius: 18px;
+          background: var(--tip); border: 1px solid var(--tip-line); color: var(--tip-text); font-weight: 600; }
+  #dica:empty { display: none; }
+
+  /* Cartões */
+  .card { margin-top: 16px; padding: 20px; border-radius: 24px; background: var(--card); box-shadow: var(--shadow); }
+  h2 { display: flex; align-items: center; gap: 8px; margin: 0 0 14px; font-size: 1.05rem; font-weight: 800; letter-spacing: -.01em; }
+
+  .campos { display: grid; grid-template-columns: 1.6fr 1fr; gap: 8px; }
+  .campos input { width: 100%; min-width: 0; padding: 13px 14px; border: 1px solid transparent; border-radius: 14px; outline: none;
+                  background: var(--field); color: inherit; font: inherit; }
+  .campos input:focus { border-color: var(--indigo); box-shadow: 0 0 0 3px #4f46e533; }
+  .cats { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; border: 0; padding: 0; }
+  .cat input { position: absolute; opacity: 0; pointer-events: none; }
+  .cat span { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; border-radius: 99px; cursor: pointer;
+              border: 1.5px solid var(--line); font-weight: 600; font-size: .92rem; transition: all .15s; }
+  .cat span:hover { border-color: var(--c); }
+  .cat input:checked + span { background: var(--c); border-color: var(--c); color: #fff; box-shadow: 0 6px 14px -6px var(--c); }
+  .cat input:focus-visible + span { outline: 3px solid #4f46e555; outline-offset: 2px; }
+  .btn { width: 100%; padding: 14px; border: 0; border-radius: 16px; cursor: pointer; color: #fff; font: inherit; font-weight: 700;
+         background: linear-gradient(135deg, var(--indigo), var(--violet)); box-shadow: 0 10px 20px -10px #4f46e5; transition: transform .15s; }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:active { transform: translateY(1px); }
+  #msg { margin: 10px 0 0; color: var(--danger); font-size: .9rem; font-weight: 600; }
+  #msg:empty { display: none; }
+
+  /* Categorias */
+  .pilha { display: flex; height: 14px; border-radius: 99px; overflow: hidden; background: var(--line); gap: 2px; }
+  .pilha span { transition: flex-grow .5s; }
+  .legenda { list-style: none; margin: 14px 0 0; padding: 0; display: grid; gap: 10px; }
+  .legenda li { display: grid; grid-template-columns: 36px 1fr auto; align-items: center; gap: 10px; }
+  .badge { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 12px; font-size: 18px; background: color-mix(in srgb, var(--c) 16%, transparent); }
+  .legenda .barra { height: 6px; margin-top: 4px; border-radius: 99px; background: var(--line); overflow: hidden; }
+  .legenda .barra span { display: block; height: 100%; border-radius: inherit; background: var(--c); }
+  .legenda strong { font-variant-numeric: tabular-nums; text-align: right; }
+  .legenda small { display: block; color: var(--muted); font-weight: 500; text-align: right; }
+
+  /* Lista */
+  #lista { list-style: none; margin: 0; padding: 0; }
+  #lista li { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); }
+  #lista li:first-child { border-top: 0; padding-top: 0; }
+  #lista li.anima { animation: entra .4s cubic-bezier(.2, .8, .2, 1.2); }
+  @keyframes entra { from { transform: translateY(-6px); opacity: 0; } }
+  .desc { flex: 1; min-width: 0; font-weight: 600; overflow-wrap: anywhere; }
+  .desc small { display: block; color: var(--muted); font-weight: 500; font-size: .85rem; }
+  .valor { font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .remover { flex: none; width: 34px; height: 34px; border: 0; border-radius: 10px; background: none; color: var(--muted);
+             font-size: 1.3rem; line-height: 1; cursor: pointer; transition: background .15s, color .15s; }
+  .remover:hover, .remover:focus-visible { background: #e11d481a; color: var(--danger); }
+  .vazio { padding: 16px 0; text-align: center; color: var(--muted); }
+  .vazio .grande { display: block; font-size: 40px; }
+
+  /* Resumo */
+  .resumo p { margin: 0 0 10px; }
+  .resumo .destaque { font-size: 1.05rem; font-weight: 700; }
+  .economia { display: grid; gap: 10px; margin-top: 14px; }
+  .economia div { display: grid; grid-template-columns: 36px 1fr; gap: 12px; padding: 14px; border-radius: 18px; background: var(--field); }
+  .economia strong { display: block; }
+  .economia em { display: inline-block; margin-top: 6px; padding: 2px 10px; border-radius: 99px; font-style: normal; font-weight: 700;
+                 font-size: .85rem; background: #16a34a1f; color: var(--ok); }
+
+  footer { margin-top: 40px; text-align: center; color: var(--muted); font-size: .85rem; }
+  @media (max-width: 420px) { h1 { font-size: 1rem; white-space: nowrap; } .mes { font-size: .75rem; padding: 3px 10px; } #total { font-size: 1.9rem; } .anel { width: 96px; height: 96px; } #pct { font-size: 1.25rem; } .anel-texto small { font-size: .6rem; } .longo { display: none; } .campos { grid-template-columns: 1fr; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
 </style>
 </head>
 <body>
 <main>
-  <header>
-    <h1>Controle de gastos</h1>
-    <p class="sub" id="titulo-mes"></p>
-  </header>
-
-  <section class="stats">
-    <div class="card stat"><small>Gasto no mês</small><strong id="total">R$ 0,00</strong></div>
-    <div class="card stat"><small>Sobra</small><strong id="sobra">—</strong></div>
-  </section>
-
-  <section class="card">
+  <header class="hero">
+    <div class="topo">
+      <h1>💸 Controle de gastos</h1>
+      <p class="mes" id="titulo-mes"></p>
+    </div>
+    <div class="saldo">
+      <div>
+        <span class="rotulo">Gasto no mês</span>
+        <strong id="total">R$ 0,00</strong>
+        <div class="sobra-linha"><span class="rotulo">Sobra:</span> <span id="sobra">—</span></div>
+      </div>
+      <div class="anel" id="anel" aria-hidden="true">
+        <svg viewBox="0 0 120 120"><circle class="fundo" cx="60" cy="60" r="50"/><circle class="valor" cx="60" cy="60" r="50"/></svg>
+        <div class="anel-texto"><span id="pct">—</span><small>do orçamento</small></div>
+      </div>
+    </div>
     <form id="form-orcamento" class="orc">
-      <label for="orcamento">Orçamento do mês (R$)</label>
-      <input id="orcamento" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ex.: 3000">
-      <button class="btn sec">Salvar</button>
+      <label for="orcamento"><span class="longo">Orçamento </span>R$</label>
+      <input id="orcamento" aria-label="Orçamento do mês em reais" type="number" min="0" step="0.01" inputmode="decimal" placeholder="Ex.: 3000">
+      <button>Salvar</button>
     </form>
-    <div class="barra" id="barra" hidden><span></span></div>
-  </section>
+  </header>
 
   <p id="dica" role="status"></p>
 
   <section class="card">
-    <h2>Novo gasto</h2>
-    <form id="form-gasto" class="grade">
-      <input id="descricao" type="text" placeholder="Descrição, ex.: mercado" maxlength="80" aria-label="Descrição" required>
-      <input id="valor" type="number" min="0.01" step="0.01" placeholder="Valor (R$)" aria-label="Valor em reais" inputmode="decimal" required>
-      <select id="categoria" aria-label="Categoria"></select>
+    <h2>➕ Novo gasto</h2>
+    <form id="form-gasto">
+      <div class="campos">
+        <input id="descricao" type="text" placeholder="Com o quê? Ex.: mercado" maxlength="80" aria-label="Descrição" required>
+        <input id="valor" type="number" min="0.01" step="0.01" placeholder="R$ 0,00" aria-label="Valor em reais" inputmode="decimal" required>
+      </div>
+      <fieldset class="cats" id="cats"><legend hidden>Categoria</legend></fieldset>
       <button class="btn">Registrar gasto</button>
     </form>
     <p id="msg" role="status"></p>
   </section>
 
+  <section class="card" id="sec-categorias">
+    <h2>📊 Para onde foi o dinheiro</h2>
+    <div class="pilha" id="pilha"></div>
+    <ul class="legenda" id="legenda"></ul>
+  </section>
+
   <section class="card">
-    <h2>Gastos do mês</h2>
+    <h2>🧾 Gastos do mês</h2>
     <ul id="lista"></ul>
   </section>
 
   <section class="card">
-    <h2>Resumo do mês</h2>
-    <p id="resumo"></p>
+    <h2>💡 Resumo do mês</h2>
+    <div class="resumo" id="resumo"></div>
   </section>
+
+  <footer>Seus dados ficam só neste navegador.</footer>
 </main>
 
 <script>
-const CATEGORIAS = ["Alimentação", "Transporte", "Lazer", "Contas", "Outros"];
-const DICAS = {
-  "Alimentação": "planeje o cardápio da semana, vá ao mercado com lista e troque delivery por marmita alguns dias.",
-  "Transporte": "junte trajetos no mesmo dia, compare aplicativo com transporte público e mantenha os pneus calibrados.",
-  "Lazer": "defina um valor fixo por semana para lazer e alterne com programas gratuitos.",
-  "Contas": "revise assinaturas e planos (celular, internet, streaming) e cancele o que pouco usa.",
-  "Outros": "anote melhor o que cai em \"Outros\": gasto sem categoria costuma ser compra por impulso.",
+const CATS = {
+  "Alimentação": { emoji: "🍽️", cor: "#f97316", dica: "Planeje o cardápio da semana, vá ao mercado com lista e troque o delivery por marmita alguns dias." },
+  "Transporte":  { emoji: "🚗", cor: "#3b82f6", dica: "Junte trajetos no mesmo dia, compare aplicativo com transporte público e mantenha os pneus calibrados." },
+  "Lazer":       { emoji: "🎉", cor: "#ec4899", dica: "Defina um valor fixo por semana para lazer e alterne com programas gratuitos." },
+  "Contas":      { emoji: "🧾", cor: "#8b5cf6", dica: "Revise assinaturas e planos (celular, internet, streaming) e cancele o que pouco usa." },
+  "Outros":      { emoji: "📦", cor: "#64748b", dica: "Anote melhor o que cai em \"Outros\": gasto sem categoria costuma ser compra por impulso." },
 };
+const CATEGORIAS = Object.keys(CATS);
 const CHAVE_ORC = "gastos_orcamento";
 const CHAVE_LISTA = "gastos_lista";
 
 // Valores guardados em centavos (inteiros): somar 0.1 + 0.2 em reais dá erro de arredondamento.
 const brl = c => (c / 100).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 const chaveMes = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+const el = (tag, props = {}, ...filhos) => { const e = Object.assign(document.createElement(tag), props); e.append(...filhos); return e; };
 
 function ler(chave, padrao) {
   try { return JSON.parse(localStorage.getItem(chave)) ?? padrao; } catch { return padrao; }
@@ -126,6 +213,7 @@ if (!Number.isFinite(orcamento) || orcamento < 0) orcamento = 0;
 let gastos = ler(CHAVE_LISTA, []);
 if (!Array.isArray(gastos)) gastos = [];
 gastos = gastos.filter(g => g && Number.isFinite(g.valor) && g.valor > 0 && typeof g.mes === "string");
+let destaque = null; // id do gasto recém-registrado, para animar só ele
 
 const msg = document.getElementById("msg");
 
@@ -140,49 +228,41 @@ function salvar() {
 
 // O orçamento é mensal: só os gastos do mês atual contam.
 const doMes = () => gastos.filter(g => g.mes === chaveMes(new Date()));
+const categoriaDe = g => (CATEGORIAS.includes(g.categoria) ? g.categoria : "Outros");
 
 function porCategoria(lista) {
   const soma = Object.fromEntries(CATEGORIAS.map(c => [c, 0]));
-  for (const g of lista) soma[CATEGORIAS.includes(g.categoria) ? g.categoria : "Outros"] += g.valor;
+  for (const g of lista) soma[categoriaDe(g)] += g.valor;
   return Object.entries(soma).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
 }
 
 function dica(total, cats) {
-  if (!total) return "Nenhum gasto registrado neste mês.";
-  if (orcamento && total > orcamento) return `Atenção: você passou ${brl(total - orcamento)} do orçamento.`;
+  if (!total) return "👋 Nenhum gasto registrado neste mês ainda.";
+  if (orcamento && total > orcamento) return `🚨 Atenção: você passou ${brl(total - orcamento)} do orçamento.`;
   const [cat, valor] = cats[0];
-  return `${cat} é a categoria que mais pesa: ${Math.round(valor / total * 100)}% do total.`;
+  return `${CATS[cat].emoji} ${cat} é a categoria que mais pesa: ${Math.round(valor / total * 100)}% do total.`;
 }
 
-// Resumo em português gerado aqui mesmo, sem IA paga.
+// Resumo do mês gerado aqui mesmo, sem IA paga.
 function resumo(lista, total, cats) {
-  if (!lista.length) return "Registre gastos para ver o resumo do mês.";
+  if (!lista.length) return null;
   const hoje = new Date();
   const ultimoDia = new Date(hoje.getFullYear(), hoje.getMonth() + 1, 0).getDate();
   const diasRestantes = ultimoDia - hoje.getDate() + 1;
   const linhas = [];
-
   if (orcamento) {
     linhas.push(`Você gastou ${brl(total)} de ${brl(orcamento)} (${Math.round(total / orcamento * 100)}% do orçamento).`);
     const sobra = orcamento - total;
     linhas.push(sobra >= 0
       ? `Faltam ${diasRestantes} dia(s) para o mês acabar: dá para gastar até ${brl(Math.floor(sobra / diasRestantes))} por dia.`
-      : `Você já passou ${brl(-sobra)} do orçamento. Tente não gastar nada que não seja essencial até o fim do mês.`);
+      : `Você já passou ${brl(-sobra)} do orçamento. Segure o que não for essencial até o fim do mês.`);
   } else {
     linhas.push(`Você gastou ${brl(total)} neste mês. Defina um orçamento para acompanhar quanto sobra.`);
   }
-
-  linhas.push("", "Para onde foi o dinheiro:");
-  for (const [cat, v] of cats) linhas.push(`• ${cat}: ${brl(v)} (${Math.round(v / total * 100)}%)`);
-
   const maior = lista.reduce((a, b) => (b.valor > a.valor ? b : a));
-  linhas.push("", `Maior gasto: ${maior.descricao} (${brl(maior.valor)}).`);
-
-  linhas.push("", "Como economizar:");
-  for (const [cat, v] of cats.slice(0, 2)) {
-    linhas.push(`• ${cat}: ${DICAS[cat]} Cortar 15% aqui economiza cerca de ${brl(Math.round(v * 0.15))} por mês.`);
-  }
-  return linhas.join("\n");
+  linhas.push(`Maior gasto: ${maior.descricao} (${brl(maior.valor)}).`);
+  const economia = cats.slice(0, 2).map(([cat, v]) => ({ cat, texto: CATS[cat].dica, valor: Math.round(v * 0.15) }));
+  return { linhas, economia };
 }
 
 function render() {
@@ -190,6 +270,9 @@ function render() {
   const total = lista.reduce((s, g) => s + g.valor, 0);
   const cats = porCategoria(lista);
 
+  // Cabeçalho
+  const mes = new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
+  document.getElementById("titulo-mes").textContent = mes.charAt(0).toUpperCase() + mes.slice(1);
   document.getElementById("orcamento").value = orcamento ? (orcamento / 100).toFixed(2) : "";
   document.getElementById("total").textContent = brl(total);
   const sobraEl = document.getElementById("sobra");
@@ -198,51 +281,90 @@ function render() {
     sobraEl.textContent = brl(sobra);
     sobraEl.classList.toggle("negativo", sobra < 0);
   } else {
-    sobraEl.textContent = "Defina o orçamento";
+    sobraEl.textContent = "—";
     sobraEl.classList.remove("negativo");
   }
-  document.getElementById("dica").textContent = dica(total, cats);
-  const mes = new Date().toLocaleDateString("pt-BR", { month: "long", year: "numeric" });
-  document.getElementById("titulo-mes").textContent = mes.charAt(0).toUpperCase() + mes.slice(1);
-  const barra = document.getElementById("barra");
-  barra.hidden = !orcamento;
-  barra.classList.toggle("estourou", total > orcamento);
-  barra.firstElementChild.style.width = orcamento ? Math.min(100, total / orcamento * 100) + "%" : "0";
+  const anel = document.getElementById("anel");
+  const circ = 2 * Math.PI * 50;
+  const fracao = orcamento ? total / orcamento : 0;
+  const arco = anel.querySelector(".valor");
+  arco.style.strokeDasharray = circ;
+  arco.style.strokeDashoffset = circ * (1 - Math.min(1, fracao));
+  anel.classList.toggle("estourou", fracao > 1);
+  document.getElementById("pct").textContent = orcamento ? Math.round(fracao * 100) + "%" : "—";
 
+  document.getElementById("dica").textContent = dica(total, cats);
+
+  // Categorias
+  const pilha = document.getElementById("pilha");
+  const legenda = document.getElementById("legenda");
+  pilha.replaceChildren(); legenda.replaceChildren();
+  document.getElementById("sec-categorias").hidden = !cats.length;
+  for (const [cat, v] of cats) {
+    const { emoji, cor } = CATS[cat];
+    const pedaco = el("span");
+    pedaco.style.cssText = `flex-grow:${v};background:${cor}`;
+    pilha.append(pedaco);
+    const barra = el("div", { className: "barra" }, el("span"));
+    barra.firstChild.style.width = (v / cats[0][1] * 100) + "%";
+    const li = el("li", {},
+      el("span", { className: "badge", textContent: emoji }),
+      el("div", {}, el("span", { textContent: cat }), barra),
+      el("div", {}, el("strong", { textContent: brl(v) }), el("small", { textContent: Math.round(v / total * 100) + "%" })));
+    li.style.setProperty("--c", cor);
+    legenda.append(li);
+  }
+
+  // Lista
   const ul = document.getElementById("lista");
   ul.replaceChildren();
   if (!lista.length) {
-    const li = document.createElement("li");
-    li.className = "vazio";
-    li.textContent = "Nenhum gasto ainda.";
-    ul.append(li);
+    ul.append(el("li", { className: "vazio" }, el("span", { className: "grande", textContent: "🪙" }), "Nenhum gasto ainda. Registre o primeiro acima."));
   }
   for (const g of [...lista].reverse()) {
-    const li = document.createElement("li");
-    const desc = document.createElement("span");
-    desc.className = "desc";
-    desc.textContent = g.descricao;
-    const info = document.createElement("small");
-    info.textContent = `${g.categoria} · ${g.data}`;
-    desc.append(info);
-    const val = document.createElement("span");
-    val.className = "valor";
-    val.textContent = brl(g.valor);
-    const x = document.createElement("button");
-    x.className = "remover";
-    x.textContent = "×";
+    const cat = categoriaDe(g);
+    const badge = el("span", { className: "badge", textContent: CATS[cat].emoji });
+    badge.style.setProperty("--c", CATS[cat].cor);
+    const x = el("button", { className: "remover", textContent: "×" });
     x.setAttribute("aria-label", `Remover ${g.descricao}`);
     // Remove pelo id, não pela posição: a lista aparece invertida e filtrada pelo mês.
     x.addEventListener("click", () => { gastos = gastos.filter(o => o.id !== g.id); salvar(); render(); });
-    li.append(desc, val, x);
-    ul.append(li);
+    ul.append(el("li", { className: g.id === destaque ? "anima" : "" },
+      badge,
+      el("span", { className: "desc", textContent: g.descricao }, el("small", { textContent: `${cat} · ${g.data}` })),
+      el("span", { className: "valor", textContent: brl(g.valor) }),
+      x));
   }
+  destaque = null;
 
-  document.getElementById("resumo").textContent = resumo(lista, total, cats);
+  // Resumo
+  const box = document.getElementById("resumo");
+  box.replaceChildren();
+  const r = resumo(lista, total, cats);
+  if (!r) {
+    box.append(el("p", { textContent: "Registre gastos para ver o resumo do mês." }));
+    return;
+  }
+  r.linhas.forEach((t, i) => box.append(el("p", { className: i === 0 ? "destaque" : "", textContent: t })));
+  const eco = el("div", { className: "economia" });
+  for (const e of r.economia) {
+    const badge = el("span", { className: "badge", textContent: CATS[e.cat].emoji });
+    badge.style.setProperty("--c", CATS[e.cat].cor);
+    eco.append(el("div", {}, badge, el("span", {},
+      el("strong", { textContent: e.cat }), e.texto, el("br"),
+      el("em", { textContent: `Cortando 15%: economia de ~${brl(e.valor)}/mês` }))));
+  }
+  box.append(el("p", { className: "destaque", textContent: "Como economizar" }), eco);
 }
 
-const sel = document.getElementById("categoria");
-for (const c of CATEGORIAS) sel.add(new Option(c, c));
+// Botões de categoria
+const fieldset = document.getElementById("cats");
+CATEGORIAS.forEach((c, i) => {
+  const input = el("input", { type: "radio", name: "categoria", value: c, defaultChecked: i === 0 });
+  const label = el("label", { className: "cat" }, input, el("span", { textContent: `${CATS[c].emoji} ${c}` }));
+  label.style.setProperty("--c", CATS[c].cor);
+  fieldset.append(label);
+});
 
 document.getElementById("form-orcamento").addEventListener("submit", e => {
   e.preventDefault();
@@ -258,9 +380,10 @@ document.getElementById("form-gasto").addEventListener("submit", e => {
   if (!descricao) { msg.textContent = "Digite uma descrição."; return; }
   if (!Number.isFinite(valor) || valor <= 0) { msg.textContent = "Digite um valor maior que zero."; return; }
   const agora = new Date();
+  destaque = Date.now().toString(36) + Math.random().toString(36).slice(2);
   gastos.push({
-    id: Date.now().toString(36) + Math.random().toString(36).slice(2),
-    descricao, valor, categoria: sel.value,
+    id: destaque, descricao, valor,
+    categoria: document.querySelector("input[name=categoria]:checked").value,
     mes: chaveMes(agora), data: agora.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
   });
   msg.textContent = "";
