@@ -189,6 +189,38 @@
   #msg { margin: 10px 0 0; color: var(--red); font-size: .85rem; font-weight: 600; text-align: center; }
   #msg:empty { display: none; }
 
+  /* Besteiras */
+  .besteira-card { color: #fff; background: linear-gradient(140deg, #ff8a4c, #ff4f7b 60%, #d63384); box-shadow: 0 16px 30px -18px #e83e6f; }
+  .bc-topo { display: flex; align-items: center; gap: 12px; }
+  .bc-topo > div { flex: 1; min-width: 0; }
+  .bc-topo small { display: block; font-weight: 600; opacity: .92; }
+  .bc-topo strong { display: block; font-size: 1.9rem; font-weight: 800; letter-spacing: -.03em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+  .bc-topo span { font-size: .8rem; opacity: .95; }
+  .bc-barra { height: 8px; margin: 14px 0; border-radius: 99px; background: #ffffff40; overflow: hidden; }
+  .bc-barra span { display: block; height: 100%; border-radius: inherit; background: #fff; transition: width .5s; }
+  .bc-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .bc-stats div { padding: 10px 12px; border-radius: 14px; background: #ffffff26; }
+  .bc-stats small { display: block; font-size: .72rem; opacity: .9; }
+  .bc-stats b { font-size: 1.02rem; font-variant-numeric: tabular-nums; }
+  .bc-top { list-style: none; margin: 12px 0 0; padding: 0; display: grid; gap: 6px; }
+  .bc-top li { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-radius: 12px; background: #ffffff1f; font-size: .85rem; }
+  .bc-top li span { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .bc-top li small { opacity: .85; }
+  .bc-frase { margin: 12px 0 0; font-size: .88rem; font-weight: 600; }
+  .tag-besteira { display: inline-block; margin-top: 4px; padding: 1px 9px; border: 1px dashed #f0b3c7; border-radius: 99px; background: none;
+                  color: #c0266b; font-size: .7rem; font-weight: 600; white-space: nowrap; cursor: pointer; }
+  .tag-besteira[aria-pressed=true] { border: 1px solid transparent; background: #ffe3ee; }
+  .toggle-besteira { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; padding: 12px 14px; border-radius: 16px; background: #fff1f5; cursor: pointer; }
+  .toggle-besteira input { position: absolute; opacity: 0; pointer-events: none; }
+  .switch { flex: none; position: relative; width: 46px; height: 28px; border-radius: 99px; background: #e5d6dc; transition: background .2s; }
+  .switch::after { content: ""; position: absolute; top: 3px; left: 3px; width: 22px; height: 22px; border-radius: 50%; background: #fff;
+                   box-shadow: 0 2px 4px rgba(0, 0, 0, .2); transition: transform .2s; }
+  .toggle-besteira input:checked + .switch { background: #ff4f7b; }
+  .toggle-besteira input:checked + .switch::after { transform: translateX(18px); }
+  .toggle-besteira input:focus-visible + .switch { outline: 3px solid #ff4f7b55; outline-offset: 2px; }
+  .toggle-besteira b { display: block; font-size: .92rem; }
+  .toggle-besteira small { display: block; color: var(--muted); font-size: .74rem; line-height: 1.3; }
+
   .toast { position: fixed; left: 50%; bottom: calc(96px + env(safe-area-inset-bottom)); z-index: 30; transform: translateX(-50%);
            padding: 10px 18px; border-radius: 99px; background: #17202a; color: #fff; font-size: .88rem; font-weight: 600; box-shadow: var(--shadow); animation: fade .2s; }
   .toast[hidden] { display: none; }
@@ -234,6 +266,8 @@
         </div>
         <p class="faixa" id="faixa"></p>
       </div>
+
+      <div class="card besteira-card" id="card-besteira"></div>
 
       <div class="card">
         <h2>Visão geral</h2>
@@ -292,6 +326,12 @@
         <input id="descricao" type="text" placeholder="Ex.: mercado, uber, cinema" maxlength="80" required>
       </label>
       <fieldset class="cat-opcoes" id="cats"><legend hidden>Categoria</legend></fieldset>
+      <label class="toggle-besteira">
+        <input type="checkbox" id="besteira">
+        <span class="switch"></span>
+        <i data-e="🍟" data-s="30"></i>
+        <span><b>É besteira?</b><small>Gasto que dava para evitar: lanche, delivery, compra por impulso…</small></span>
+      </label>
       <button class="btn">Registrar gasto</button>
       <p id="msg" role="status"></p>
     </form>
@@ -371,6 +411,15 @@ function porCategoria(lista) {
   for (const g of lista) soma[categoriaDe(g)] += g.valor;
   return Object.entries(soma).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]);
 }
+
+// Besteira: o usuário marca; sem marcação, o app sugere pelas palavras da descrição.
+const PALAVRAS_BESTEIRA = ["ifood", "delivery", "rappi", "lanche", "lanchonete", "hamburguer", "burger", "pizza", "refrigerante", "refri",
+  "cerveja", "chopp", "bar", "balada", "doce", "chocolate", "sorvete", "acai", "salgado", "pastel", "cigarro", "aposta", "bet", "skin",
+  "shopping", "roupa", "tenis", "maquiagem", "energetico", "mcdonalds", "mc donalds", "starbucks", "bala", "bombom", "pipoca", "besteira", "impulso"];
+const RE_BESTEIRA = new RegExp(`\\b(${PALAVRAS_BESTEIRA.join("|")})s?\\b`);
+const semAcento = s => String(s).toLowerCase().normalize("NFD").replace(/\p{M}/gu, "");
+const sugerirBesteira = desc => RE_BESTEIRA.test(semAcento(desc));
+const ehBesteira = g => (typeof g.besteira === "boolean" ? g.besteira : sugerirBesteira(g.descricao));
 
 function dica(total, cats) {
   if (!total) return { e: "👋", t: "Vamos começar?", s: "Nenhum gasto registrado neste mês ainda. Toque no + para adicionar." };
@@ -475,9 +524,46 @@ function render() {
   box.className = "aviso" + (d.ruim ? " ruim" : "");
   box.replaceChildren(icone(d.e, 52), el("div", {}, el("b", { textContent: d.t }), el("span", { textContent: d.s })));
 
+  renderBesteira(lista, total);
   renderGastos(lista, total, cats);
   renderResumo(lista, total, cats, sobra);
   destaque = null;
+}
+
+function renderBesteira(lista, total) {
+  const card = document.getElementById("card-besteira");
+  const bests = lista.filter(ehBesteira);
+  const tb = somar(bests);
+  const pct = total ? Math.round(tb / total * 100) : 0;
+  const barra = el("div", { className: "bc-barra" }, el("span"));
+  barra.firstChild.style.width = pct + "%";
+  card.replaceChildren(
+    el("div", { className: "bc-topo" }, icone("🍟", 56),
+      el("div", {}, el("small", { textContent: "Gastos com besteira" }), el("strong", { textContent: brl(tb) }),
+        el("span", { textContent: total ? `${pct}% de tudo que você gastou no mês` : "Nenhum gasto no mês ainda" }))),
+    barra,
+    el("div", { className: "bc-stats" },
+      el("div", {}, el("small", { textContent: "Em 1 ano, nesse ritmo" }), el("b", { textContent: brl(tb * 12) })),
+      el("div", {}, el("small", { textContent: "Média por dia" }), el("b", { textContent: brl(Math.round(tb / new Date().getDate())) }))));
+  if (!bests.length) {
+    card.append(el("p", { className: "bc-frase", textContent: lista.length
+      ? "Nenhuma besteira este mês. Mandou bem! 🎉"
+      : "Ao registrar, marque \"É besteira?\" nos gastos que dava para evitar." }));
+    return;
+  }
+  // As besteiras que mais pesam, agrupadas pela descrição (ex.: 3× iFood)
+  const grupos = {};
+  for (const g of bests) {
+    const k = semAcento(g.descricao);
+    grupos[k] ||= { nome: g.descricao, vezes: 0, valor: 0, cat: categoriaDe(g) };
+    grupos[k].vezes++;
+    grupos[k].valor += g.valor;
+  }
+  const top = Object.values(grupos).sort((a, b) => b.valor - a.valor).slice(0, 3);
+  card.append(
+    el("ul", { className: "bc-top" }, ...top.map(t =>
+      el("li", {}, icone(CATS[t.cat].e, 22), el("span", { textContent: t.nome }), el("small", { textContent: `${t.vezes}×` }), el("b", { textContent: brl(t.valor) })))),
+    el("p", { className: "bc-frase", textContent: `Cortando metade, sobram ${brl(Math.round(tb / 2))} no mês e ${brl(tb * 6)} no ano.` }));
 }
 
 function renderGastos(lista, total, cats) {
@@ -530,9 +616,12 @@ function renderGastos(lista, total, cats) {
     x.setAttribute("aria-label", `Remover ${g.descricao}`);
     // Remove pelo id, não pela posição: a lista aparece invertida e filtrada pelo mês.
     x.addEventListener("click", () => { gastos = gastos.filter(o => o.id !== g.id); salvar(); render(); aviso("Gasto removido"); });
+    const tag = el("button", { className: "tag-besteira", type: "button", textContent: ehBesteira(g) ? "🍟 besteira" : "+ besteira", title: "Marcar ou desmarcar como besteira" });
+    tag.setAttribute("aria-pressed", ehBesteira(g));
+    tag.addEventListener("click", () => { g.besteira = !ehBesteira(g); salvar(); render(); });
     lanc.append(el("li", { className: g.id === destaque ? "anima" : "" },
       caixaIcone(cat),
-      el("span", { className: "desc", textContent: g.descricao }, el("small", { textContent: `${cat} · ${g.data}` })),
+      el("span", { className: "desc", textContent: g.descricao }, el("small", { textContent: `${cat} · ${g.data}` }), tag),
       el("span", { className: "valor", textContent: brl(g.valor) }),
       x));
   }
@@ -548,6 +637,15 @@ function renderResumo(lista, total, cats, sobra) {
   }
   box.append(el("div", { className: "card situacao" }, ...r.linhas.map(t => el("p", { textContent: t }))));
   const eco = el("div", { className: "card" }, el("h2", { textContent: "Como economizar" }));
+  const bests = lista.filter(ehBesteira);
+  const tb = somar(bests);
+  if (tb) {
+    const ic = el("span", { className: "ic-box" }, icone("🍟", 30));
+    ic.style.setProperty("--bg-c", "#ffe3ee");
+    eco.append(el("div", { className: "eco" }, ic, el("div", {}, el("b", { textContent: "Besteiras" }),
+      el("span", { textContent: `Foram ${brl(tb)} em ${bests.length} gasto(s) que dava para evitar.` }), el("br"),
+      el("em", { textContent: `Cortando metade: ~${brl(Math.round(tb / 2))}/mês, ${brl(tb * 6)}/ano` }))));
+  }
   for (const e of r.economia) {
     eco.append(el("div", { className: "eco" }, caixaIcone(e.cat, 30),
       el("div", {}, el("b", { textContent: e.cat }), el("span", { textContent: e.texto }), el("br"),
@@ -591,6 +689,12 @@ CATEGORIAS.forEach((c, i) => {
   fieldset.append(el("label", {}, input, op));
 });
 
+// "É besteira?" se marca sozinho pela descrição, até o usuário mexer no botão.
+const chkBesteira = document.getElementById("besteira");
+let besteiraManual = false;
+chkBesteira.addEventListener("change", () => { besteiraManual = true; });
+document.getElementById("descricao").addEventListener("input", e => { if (!besteiraManual) chkBesteira.checked = sugerirBesteira(e.target.value); });
+
 document.getElementById("btn-orc").addEventListener("click", () => { editandoOrc = !editandoOrc; render(); if (editandoOrc) document.getElementById("orcamento").focus(); });
 document.getElementById("form-orcamento").addEventListener("submit", e => {
   e.preventDefault();
@@ -614,10 +718,12 @@ document.getElementById("form-gasto").addEventListener("submit", e => {
     id: destaque, descricao, valor,
     categoria: document.querySelector("input[name=categoria]:checked").value,
     mes: chaveMes(agora), data: agora.toLocaleDateString("pt-BR", { day: "2-digit", month: "2-digit" }),
+    besteira: chkBesteira.checked,
   });
   msg.textContent = "";
   salvar(); render();
   e.target.reset();
+  besteiraManual = false;
   fecharGaveta();
   aviso(`${brl(valor)} registrado`);
 });

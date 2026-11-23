@@ -9,6 +9,7 @@ Controle de gastos do mês, feito em um único arquivo HTML: HTML, CSS e JavaScr
 - Dica automática: mostra a categoria que mais pesa, com a porcentagem, ou avisa quando o orçamento estoura.
 - Resumo do mês em português: quanto ainda dá para gastar por dia, para onde foi o dinheiro e sugestões concretas de economia, com o valor estimado.
 
+- Gastos com besteira: cada gasto pode ser marcado como besteira (o app sugere sozinho para iFood, lanche, cerveja etc.). Um cartão mostra quanto foi no mês, a porcentagem do total, quanto isso vira em 1 ano e as besteiras que mais se repetem.
 - Visual de aplicativo de celular: rosca do orçamento, gráfico dos últimos 6 meses com comparação com o mês anterior, botão + que abre uma gaveta para registrar o gasto, e menu embaixo (Início, Gastos e Resumo).
 
 Ícones: [Fluent Emoji 3D](https://github.com/microsoft/fluentui-emoji), da Microsoft (licença MIT). Sem internet, o app usa os emojis comuns do sistema.
